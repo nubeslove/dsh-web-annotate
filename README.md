@@ -24,7 +24,10 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 - **画面推流**：CDP `Page.startScreencast` 出帧，SSE 推到侧栏，页面一有变化就刷新。
 - **元素拾取**：开启批注模式后，鼠标指向哪里，就高亮哪个元素并显示 `标签 / 尺寸 / 背景色 / 字体 / 字号 / 字重`。
 - **就地评论**：点元素弹出输入框，回车即存；批注列表在下方可逐条删除。
-- **结构化汇总**：一键复制成带 CSS 选择器的清单，直接贴进输入框。
+- **框选区域**：按住拖动可以框一块区域批注，适合「这一整块间距不对」这类说不清是哪个元素的意见。
+- **一键回填**：点 **↩** 把汇总直接写进对话输入框，不用复制粘贴。
+- **快捷键**：`Ctrl+Shift+.` 切换批注模式。
+- **交互转发**：退出拾取后，点击、滚轮、方向键、Enter、Tab、Esc、Backspace、PageUp/PageDown 都会转发给页面。
 
 ## 汇总长这样
 
@@ -44,8 +47,8 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 
 1. 点右侧栏 tab 条的添加按钮，选 **网页批注**。
 2. 地址栏输入 `localhost:5173`，回车。首次启动浏览器要等几秒。
-3. 点工具栏的 **◱ 批注** 进入拾取模式。指向元素看信息，点一下写评论。
-4. 点 **⧉** 复制汇总，粘进输入框。
+3. 点工具栏的 **◱ 批注**（或按 `Ctrl+Shift+.`）进入拾取模式。指向元素看信息，点一下写评论；按住拖动可以框一块区域。
+4. 点 **↩** 把汇总回填到输入框，或点 **⧉** 复制到剪贴板。
 
 退出拾取模式后，点击和滚轮会正常传给页面，可以当普通预览用。
 
@@ -92,8 +95,9 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 ## 已知限制
 
 - 画面是帧流，快速滚动或动画多时会有轻微延迟。
-- 拾取模式会拦截点击，要操作页面（点按钮、输入）需先退出拾取。
-- 尚未支持键盘输入到页面（`type: 'key'` 接口已实现，客户端未接 UI）。
+- 拾取模式会拦截点击与滚动，要操作页面（点按钮、输入）需先退出拾取。
+- 键盘只转发导航键与编辑键（方向键、Enter、Tab、Esc、Backspace、PageUp/PageDown），不转发可打印字符；中文输入法在页面内不可用。
+- 回填依赖 DSH 的 `conversation.input.left` 插槽存在。该插槽没挂上时自动退回复制到剪贴板。
 - 批注不持久化，刷新或关 tab 即丢。
 - 不支持跨 iframe 拾取（顶层文档之外的元素拿不到）。
 - 只在 Windows + DeepSeek Harness `0.2.x` 桌面端验证过。
@@ -101,7 +105,7 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 ## 开发与验证
 
 ```bash
-node scripts/verify.mjs   # 静态 + 路由级，16 项，不启动浏览器
+node scripts/verify.mjs   # 静态 + 路由级，17 项，不启动浏览器
 node scripts/smoke.mjs    # 端到端：起站点、起 chromium、取帧、拾取、输入、刷新、关闭，8 项
 ```
 
@@ -125,6 +129,11 @@ dsh plugin --profile desktop add "link:/absolute/path/to/dsh-web-annotate"
 ```
 
 路径含空格时改为手工方式：在 `profiles/desktop/package.json` 的 `dependencies` 加 `"dsh-web-annotate": "link:E:/path/to/dsh-web-annotate"`，在 `dsh.profile.bundles` 追加 `"dsh-web-annotate"`，并在 `profiles/desktop/node_modules/` 下建指向本目录的 Junction，然后重启 DSH。
+
+## 更新记录
+
+- **0.2.0** — 批注汇总可直接回填输入框（在 `conversation.input.left` 挂桥接组件拿到 `inputActions`，桥不可用时退回复制）；新增 `Ctrl+Shift+.` 快捷键、拖动框选区域、方向键与编辑键转发。自检增至 17 项。
+- **0.1.0** — 首个版本。
 
 ## 许可证
 

@@ -96,6 +96,17 @@ async function main() {
     assert(clientSource.includes('builtDigest'), '缺少批注汇总');
   });
 
+  await check('客户端具备回填与框选能力', () => {
+    assert(clientSource.includes('InputBridge'), '缺少输入框桥');
+    assert(clientSource.includes('conversation.input.left'), '桥未挂到输入框插槽');
+    assert(clientSource.includes('setDraft'), '缺少回填调用');
+    assert(clientSource.includes('wa-marquee'), '缺少框选样式');
+    assert(clientSource.includes('finishRegion'), '缺少框选处理');
+    assert(clientSource.includes('onStageKeyDown'), '缺少按键转发');
+    assert(clientSource.includes('event.ctrlKey') && clientSource.includes('event.shiftKey'), '缺少 Ctrl+Shift+. 快捷键');
+    assert(clientSource.includes('Period'), '快捷键未覆盖句点键码');
+  });
+
   const plugin = await import(pathToFileURL(join(root, 'lib', 'index.js')).href);
 
   await check('宿主导出 name / apply / resolveUrl', () => {
