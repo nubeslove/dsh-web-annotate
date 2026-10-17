@@ -208,6 +208,27 @@ async function main() {
     assert(/unknown session/.test(b.error), 'pick 错误信息不符：' + b.error);
   });
 
+  await check('文本输入与导出的拒绝分支', async () => {
+    const invalidSession = await call('POST', '/api/web-annotate/input', {
+      session: 'nope',
+      type: 'text',
+      text: 'x'
+    });
+    assert(/unknown session/.test(invalidSession.error), 'input 错误信息不符：' + invalidSession.error);
+
+    const emptyExport = await call('POST', '/api/web-annotate/export', { content: '   ' });
+    assert(/empty/.test(emptyExport.error), 'export 错误信息不符：' + emptyExport.error);
+  });
+
+  await check('宿主具备穿透与输入/导出实现', async () => {
+    const source = await readFile(join(root, 'lib', 'index.js'), 'utf8');
+    assert(source.includes('pickDeep'), '缺少 iframe 穿透');
+    assert(source.includes('childFrames'), '缺少子 frame 遍历');
+    assert(source.includes('insertText'), '缺少文本输入');
+    assert(source.includes('/export'), '缺少导出路由');
+    assert(source.includes('web-annotate'), '导出目录不符');
+  });
+
   await check('非法路由返回 404', async () => {
     const body = await call('GET', '/api/web-annotate/nope');
     assert(/no route/.test(body.error), '错误信息不符：' + body.error);

@@ -15,10 +15,14 @@ const PAGE = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
   h1 { margin:0; padding:28px 32px 8px; font-size:22px; }
   .card { margin:12px 32px; padding:16px 18px; background:#fff; border:1px solid #e3e6eb; border-radius:10px; }
   .card.accent { border-color:#2f7de1; }
+  #field { margin:12px 32px; width:320px; padding:8px 10px; border:1px solid #ccd2da; border-radius:8px; }
+  #inner { position:absolute; left:32px; top:330px; width:420px; height:150px; border:1px solid #ccd2da; border-radius:8px; }
 </style></head><body>
 <h1 id="title">批注冒烟页</h1>
 <div class="card" id="card-a">第一张卡片</div>
 <div class="card accent" id="card-b">第二张卡片（带强调边框）</div>
+<input id="field" placeholder="可输入" />
+<iframe id="inner" srcdoc="&lt;style&gt;body{margin:0;font-family:system-ui}.box{padding:26px;background:#eef4ff;color:#12324f}&lt;/style&gt;&lt;div class='box' id='inner-box'&gt;iframe 内部元素&lt;/div&gt;"></iframe>
 </body></html>`;
 
 let passed = 0;
@@ -165,6 +169,58 @@ async function main() {
       });
       const body = await res.json();
       assert(body.ok === true, '输入失败：' + (body.error || ''));
+    });
+
+    await check('穿透 iframe 拾取内部元素', async () => {
+      // iframe 位于 (32,330) 起、420x150 的区域，内部 .box 有 26px 内边距
+      const res = await fetch(base + '/pick', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ session: sessionId, x: 140, y: 400, hover: false })
+      });
+      const body = await res.json();
+      const info = body.data;
+      assert(info, '未返回元素');
+      assert(info.id === 'inner-box', '应穿透到 iframe 内部元素，实际 ' + info.id + ' <' + info.tag + '>');
+      assert(Array.isArray(info.framePath) && info.framePath.length >= 1, '缺少穿透路径：' + JSON.stringify(info.framePath));
+      console.log('        frame path=' + info.framePath.join(' > ') + ' -> #' + info.id);
+    });
+
+    await check('中文文本输入到页面', async () => {
+      await fetch(base + '/input', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ session: sessionId, type: 'click', x: 150, y: 222 })
+      });
+      const typed = await fetch(base + '/input', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ session: sessionId, type: 'text', text: '中文输入测试' })
+      });
+      const typedBody = await typed.json();
+      assert(typedBody.ok === true, '输入失败：' + (typedBody.error || ''));
+
+      const res = await fetch(base + '/pick', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ session: sessionId, x: 150, y: 222, hover: false })
+      });
+      const info = (await res.json()).data;
+      assert(info && info.tag === 'input', '应命中输入框，实际 ' + (info && info.tag));
+      assert(info.value === '中文输入测试', '输入框内容不符：' + JSON.stringify(info.value));
+      console.log('        field value=' + JSON.stringify(info.value));
+    });
+
+    await check('导出批注文件', async () => {
+      const res = await fetch(base + '/export', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ content: '## 网页批注\n\n1. `#card-a`\n   边距太大' })
+      });
+      const body = await res.json();
+      assert(body.ok === true, '导出失败：' + (body.error || ''));
+      assert(body.data.path.includes('web-annotate'), '导出路径不符：' + body.data.path);
+      console.log('        exported to ' + body.data.path);
     });
 
     await check('刷新页面', async () => {

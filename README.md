@@ -29,6 +29,9 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 - **快捷键**：`Ctrl+Shift+.` 切换批注模式。
 - **交互转发**：退出拾取后，点击、滚轮、方向键、Enter、Tab、Esc、Backspace、PageUp/PageDown 都会转发给页面。
 - **批注留得住**：按页面地址存在 `localStorage`，关掉 tab 再打开还在；删完自动清空。
+- **穿透 iframe**：页面里嵌的 iframe（含跨域）也能点进去拾取，信息浮层会标出所在层级。
+- **页面内输入**：工具栏 `⌨` 把一段文本（含中文）送进页面当前焦点元素，绕开键盘布局与输入法。
+- **导出成文件**：`⤓` 把汇总写成 Markdown，存到 `~/.dsh/web-annotate/` 下。
 
 ## 汇总长这样
 
@@ -97,10 +100,11 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 
 - 画面是帧流，快速滚动或动画多时会有轻微延迟。
 - 拾取模式会拦截点击与滚动，要操作页面（点按钮、输入）需先退出拾取。
-- 键盘只转发导航键与编辑键（方向键、Enter、Tab、Esc、Backspace、PageUp/PageDown），不转发可打印字符；中文输入法在页面内不可用。
+- 键盘只转发导航键与编辑键（方向键、Enter、Tab、Esc、Backspace、PageUp/PageDown）；可打印字符走 `⌨` 面板的整段输入，逐字键入不转。
 - 回填依赖 DSH 的 `conversation.input.left` 插槽存在。该插槽没挂上时自动退回复制到剪贴板。
+- iframe 穿透最多 4 层；超出的部分会被当成普通 iframe 元素本身。
+- 导出固定写到 `~/.dsh/web-annotate/`，不写项目目录。
 - 批注存在 `localStorage`，按页面地址分键；换浏览器 profile 或清理站点数据会丢。
-- 不支持跨 iframe 拾取（顶层文档之外的元素拿不到）。
 - 只在 Windows + DeepSeek Harness `0.2.x` 桌面端验证过。
 
 ## 开发与验证
@@ -133,6 +137,7 @@ dsh plugin --profile desktop add "link:/absolute/path/to/dsh-web-annotate"
 
 ## 更新记录
 
+- **0.3.0** — 攻克三处硬限制：拾取可递归穿透 iframe（`frame.childFrames()` 逐层进入子文档，跨域也能读，最多 4 层，浮层显示所在层级）；新增 `⌨` 页面文本输入面板，用 `keyboard.insertText` 送中文等任意字符；新增 `⤓` 导出，把汇总写成 Markdown 到 `~/.dsh/web-annotate/`。自检 19 项，冒烟 11 项。
 - **0.2.0** — 批注汇总可直接回填输入框（在 `conversation.input.left` 挂桥接组件拿到 `inputActions`，桥不可用时退回复制）；新增 `Ctrl+Shift+.` 快捷键、拖动框选区域、方向键与编辑键转发、批注 `localStorage` 持久化。自检增至 17 项。
 - **0.1.0** — 首个版本。
 
