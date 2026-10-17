@@ -129,11 +129,25 @@ PASS  拾取元素返回标签与样式
 
 ## 安装
 
+### 一条命令
+
+```bash
+dsh plugin --profile desktop add "github:nubeslove/dsh-web-annotate"
+```
+
+然后在 `$DSH_HOME/profiles/desktop/package.json` 的 `dsh.profile.bundles` 里追加 `"dsh-web-annotate"`，重启 DSH。
+
+插件本身不含运行时依赖；Playwright 在运行时从 DSH profile 目录解析，复用 DSH 自带的 Chromium，不会额外下载浏览器。
+
+### 本地开发
+
+自己改代码时用 link 指向工作副本：
+
 ```bash
 dsh plugin --profile desktop add "link:/absolute/path/to/dsh-web-annotate"
 ```
 
-路径含空格时改为手工方式：在 `profiles/desktop/package.json` 的 `dependencies` 加 `"dsh-web-annotate": "link:E:/path/to/dsh-web-annotate"`，在 `dsh.profile.bundles` 追加 `"dsh-web-annotate"`，并在 `profiles/desktop/node_modules/` 下建指向本目录的 Junction，然后重启 DSH。
+路径含空格时手工处理：在 `profiles/desktop/package.json` 的 `dependencies` 加 `"dsh-web-annotate": "link:E:/path/to/dsh-web-annotate"`，在 `dsh.profile.bundles` 追加 `"dsh-web-annotate"`，并在 `profiles/desktop/node_modules/` 下建指向本目录的 Junction，然后重启 DSH。
 
 ## 更新记录
 
