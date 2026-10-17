@@ -8,6 +8,8 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 [![DSH](https://img.shields.io/badge/DeepSeek%20Harness-0.2.0--rc.1%2B-blue.svg)](https://github.com/deepseek-ai/deepseek-harness)
 [![Topic: dsh-plugin](https://img.shields.io/badge/topic-dsh--plugin-0284c7.svg)](https://github.com/topics/dsh-plugin)
 
+> 装不上、报错、或者行为和文档对不上，直接发邮件到 **1992335297@qq.com**，比开 Issue 更快被看到。
+
 ---
 
 ![侧栏网页批注](docs/annotate.png)
@@ -159,6 +161,16 @@ dsh plugin --profile desktop add "link:/absolute/path/to/dsh-web-annotate"
 
 [MIT](LICENSE)
 
-## 联系
+## 反馈与联系 / Feedback & Contact
 
-邮箱：**1992335297@qq.com**
+遇到 bug、安装失败、行为和文档不一致，或者想要某个功能，都可以直接发邮件。
+
+**邮箱：1992335297@qq.com**
+
+邮件里带上这三样，定位会快很多：
+
+- 插件版本（`package.json` 里的 `version`）
+- DSH 版本（`dsh --version`）
+- 报错的完整文字或截图
+
+也可以在 [GitHub Issues](https://github.com/nubeslove/dsh-web-annotate/issues) 提，但邮件更快。
