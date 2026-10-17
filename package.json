@@ -1,0 +1,62 @@
+{
+  "name": "dsh-web-annotate",
+  "version": "0.1.0",
+  "description": "DSH 侧栏网页批注：在宿主里跑真实浏览器，指向页面元素即可看到标签/尺寸/颜色/字体，点一下就地批注，汇总成结构化指令。",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "scripts",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots"
+      ]
+    }
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "plugin",
+    "annotate",
+    "browser",
+    "playwright",
+    "cdp",
+    "sidebar"
+  ],
+  "author": {
+    "name": "nubeslove",
+    "email": "1992335297@qq.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nubeslove/dsh-web-annotate.git"
+  },
+  "homepage": "https://github.com/nubeslove/dsh-web-annotate#readme",
+  "bugs": {
+    "url": "https://github.com/nubeslove/dsh-web-annotate/issues"
+  },
+  "engines": {
+    "node": ">=22.19"
+  }
+}

@@ -1,0 +1,4 @@
+# dsh-web-annotate bundle patch：把插件挂进 profile
+- insert:
+    - id: web-annotate
+      name: 'dsh-web-annotate'

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>dsh-web-annotate 界面示意</title>
+<style>
+  :root {
+    --bg: #16181d;
+    --elevated: #1f2229;
+    --text: #e6e8eb;
+    --text-secondary: #9aa4b2;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #101216;
+    color: var(--text);
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 14px;
+  }
+
+  .shot { width: 700px; padding: 26px 28px 30px; background: #101216; }
+
+  .shot-label {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    opacity: 0.65;
+    margin-bottom: 14px;
+  }
+
+  .panel {
+    border: 1px solid rgba(127, 127, 127, 0.25);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    background: var(--bg);
+  }
+
+  /* 工具栏 */
+  .wa-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 8px;
+    background: var(--elevated);
+    border-bottom: 1px solid rgba(127, 127, 127, 0.22);
+  }
+
+  .wa-input {
+    flex: 1 1 auto;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(127, 127, 127, 0.3);
+    background: transparent;
+    color: var(--text);
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  .wa-btn {
+    height: 28px;
+    min-width: 28px;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .wa-btn.primary { background: #2f7de1; border-color: #2f7de1; color: #fff; }
+  .wa-btn.active { background: rgba(56, 160, 255, 0.2); border-color: rgba(56, 160, 255, 0.55); color: #8cc8ff; }
+
+  /* 画面区 */
+  .wa-stage { position: relative; height: 330px; background: #0d0f13; overflow: hidden; }
+
+  .page {
+    position: absolute;
+    inset: 0;
+    background: #f7f8fa;
+    color: #1c1f24;
+    padding: 26px 30px;
+  }
+
+  .page h1 { margin: 0 0 6px; font-size: 19px; color: #12161c; }
+  .page p.sub { margin: 0 0 20px; font-size: 12px; color: #6b7280; }
+
+  .dialog {
+    position: relative;
+    width: 460px;
+    padding: 18px 20px;
+    background: #fff4f2;
+    border: 1px solid #f2d6d0;
+    border-radius: 10px;
+  }
+
+  .dialog .dot { color: #d64545; font-size: 18px; margin-right: 6px; vertical-align: -2px; }
+  .dialog strong { font-size: 15px; color: #b3261e; }
+  .dialog .line { margin-top: 10px; font-size: 12.5px; color: #5b4340; }
+  .dialog .btn {
+    margin-top: 14px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    background: #c94f44;
+    color: #fff;
+    font-size: 12px;
+    display: inline-block;
+  }
+
+  /* 拾取高亮 */
+  .outline {
+    position: absolute;
+    border: 2px solid #4aa3ff;
+    border-radius: 3px;
+    background: rgba(74, 163, 255, 0.12);
+    pointer-events: none;
+  }
+
+  .tip {
+    position: absolute;
+    padding: 7px 9px;
+    border-radius: 8px;
+    background: rgba(16, 18, 22, 0.96);
+    border: 1px solid rgba(127, 127, 127, 0.32);
+    color: #e6e8eb;
+    font-size: 11px;
+    line-height: 1.6;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  .tip b { color: #8cc8ff; font-weight: 600; }
+  .tip .k { opacity: 0.55; }
+
+  /* 批注列表 */
+  .wa-foot { border-top: 1px solid rgba(127, 127, 127, 0.22); background: var(--elevated); }
+
+  .wa-note {
+    display: flex;
+    gap: 8px;
+    padding: 9px 10px;
+    font-size: 11.5px;
+    line-height: 1.55;
+    border-bottom: 1px solid rgba(127, 127, 127, 0.14);
+  }
+
+  .wa-note-sel { flex: 0 0 auto; max-width: 44%; color: #8cc8ff; font-family: var(--mono); opacity: 0.9; }
+  .wa-note-body { flex: 1 1 auto; }
+  .wa-note-del { color: rgba(230, 232, 235, 0.45); }
+</style>
+</head>
+<body>
+  <section class="shot" id="shot-annotate">
+    <div class="shot-label">右侧栏 · 网页批注</div>
+    <div class="panel">
+      <div class="wa-bar">
+        <input class="wa-input" value="localhost:5173" readonly />
+        <button class="wa-btn primary">打开</button>
+        <button class="wa-btn active">◱ 批注</button>
+        <button class="wa-btn">↻</button>
+        <button class="wa-btn">⧉ 1</button>
+      </div>
+
+      <div class="wa-stage">
+        <div class="page">
+          <h1>天机镜 · 角色卡</h1>
+          <p class="sub">每页三态：世界内 → 角色卡 → 暂停</p>
+          <div class="dialog">
+            <div><span class="dot">!</span><strong>窗口尺寸不足</strong></div>
+            <div class="line">请全屏使用，并将窗口可用区域调整至至少 <b>1600 × 900</b>。</div>
+            <div class="line">当前可用区域　　　　　　　605 × 884<br />推荐尺寸　　　　　　　1920 × 1080（1080p）</div>
+            <div class="btn">⤢ 进入全屏</div>
+          </div>
+        </div>
+
+        <div class="outline" style="left: 30px; top: 90px; width: 502px; height: 176px;"></div>
+
+        <div class="tip" style="left: 42px; top: 6px;">
+          <div><b>dialog</b></div>
+          <div><span class="k">尺寸 </span>520×291</div>
+          <div><span class="k">颜色 </span>#FFF4F2</div>
+          <div><span class="k">字体 </span>16px system-ui, sans-</div>
+        </div>
+      </div>
+
+      <div class="wa-foot">
+        <div class="wa-note">
+          <span class="wa-note-sel">div.dialog</span>
+          <span class="wa-note-body">这个提示框在 1080p 下也不该出现，判定阈值算错了</span>
+          <span class="wa-note-del">✕</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
