@@ -105,6 +105,8 @@ async function main() {
     assert(clientSource.includes('onStageKeyDown'), '缺少按键转发');
     assert(clientSource.includes('event.ctrlKey') && clientSource.includes('event.shiftKey'), '缺少 Ctrl+Shift+. 快捷键');
     assert(clientSource.includes('Period'), '快捷键未覆盖句点键码');
+    assert(clientSource.includes('notesStorageKey'), '缺少批注持久化键');
+    assert(clientSource.includes('localStorage'), '缺少 localStorage 持久化');
   });
 
   const plugin = await import(pathToFileURL(join(root, 'lib', 'index.js')).href);

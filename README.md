@@ -28,6 +28,7 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 - **一键回填**：点 **↩** 把汇总直接写进对话输入框，不用复制粘贴。
 - **快捷键**：`Ctrl+Shift+.` 切换批注模式。
 - **交互转发**：退出拾取后，点击、滚轮、方向键、Enter、Tab、Esc、Backspace、PageUp/PageDown 都会转发给页面。
+- **批注留得住**：按页面地址存在 `localStorage`，关掉 tab 再打开还在；删完自动清空。
 
 ## 汇总长这样
 
@@ -98,7 +99,7 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 - 拾取模式会拦截点击与滚动，要操作页面（点按钮、输入）需先退出拾取。
 - 键盘只转发导航键与编辑键（方向键、Enter、Tab、Esc、Backspace、PageUp/PageDown），不转发可打印字符；中文输入法在页面内不可用。
 - 回填依赖 DSH 的 `conversation.input.left` 插槽存在。该插槽没挂上时自动退回复制到剪贴板。
-- 批注不持久化，刷新或关 tab 即丢。
+- 批注存在 `localStorage`，按页面地址分键；换浏览器 profile 或清理站点数据会丢。
 - 不支持跨 iframe 拾取（顶层文档之外的元素拿不到）。
 - 只在 Windows + DeepSeek Harness `0.2.x` 桌面端验证过。
 
@@ -132,7 +133,7 @@ dsh plugin --profile desktop add "link:/absolute/path/to/dsh-web-annotate"
 
 ## 更新记录
 
-- **0.2.0** — 批注汇总可直接回填输入框（在 `conversation.input.left` 挂桥接组件拿到 `inputActions`，桥不可用时退回复制）；新增 `Ctrl+Shift+.` 快捷键、拖动框选区域、方向键与编辑键转发。自检增至 17 项。
+- **0.2.0** — 批注汇总可直接回填输入框（在 `conversation.input.left` 挂桥接组件拿到 `inputActions`，桥不可用时退回复制）；新增 `Ctrl+Shift+.` 快捷键、拖动框选区域、方向键与编辑键转发、批注 `localStorage` 持久化。自检增至 17 项。
 - **0.1.0** — 首个版本。
 
 ## 许可证
