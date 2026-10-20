@@ -34,6 +34,30 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 - **穿透 iframe**：页面里嵌的 iframe（含跨域）也能点进去拾取，信息浮层会标出所在层级。
 - **页面内输入**：工具栏 `⌨` 把一段文本（含中文）送进页面当前焦点元素，绕开键盘布局与输入法。
 - **导出成文件**：`⤓` 把汇总写成 Markdown，存到 `~/.dsh/web-annotate/` 下。
+- **手动入口**：对话输入框左侧有一个 **◱ 网页** 按钮，随时点开面板自己输地址，不用等模型触发。
+- **可被 DSH 接管**：浏览器启动时暴露 CDP 端点，`playwright-mcp` 能以 `mode: attach` 接上同一个浏览器，模型操作的就是侧栏里看得见的这个。
+
+## 让 DSH 在侧栏里操作浏览器
+
+默认情况下 DSH 的浏览器工具启动的是独立的 headless Chromium，你看不见它在做什么。可以改成接管本插件的浏览器：
+
+1. 先打开一次「网页批注」面板，让浏览器起来（`GET /api/web-annotate/health` 里 `cdpEndpoint` 不为 null 即就绪）。
+2. 修改 `$DSH_HOME/profiles/desktop/cordis.patch.yml` 里 playwright 提供方的配置：
+
+```yaml
+- insert:
+    - id: browser-use
+      name: "@deepseek-ai/dsh-browser-use"
+    - id: browser-use-playwright-mcp
+      name: "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp"
+      config:
+        mode: attach
+        endpoint: http://127.0.0.1:9222
+```
+
+3. 重启 DSH。之后模型每次调用浏览器工具，操作的都是侧栏里那个浏览器。
+
+**注意**：`attach` 模式下浏览器必须先在跑。如果插件没启动浏览器（没打开过面板、或插件被禁用），模型的浏览器工具会直接失败。想退回独立浏览器，把 `mode` 改回 `launch`、删掉 `endpoint` 即可。端口可用环境变量 `DSH_ANNOTATE_CDP_PORT` 改；端口被占用时插件会自动退化为不开调试端口，此时 `cdpEndpoint` 为 `null`。
 
 ## 汇总长这样
 
@@ -153,6 +177,7 @@ dsh plugin --profile desktop add "link:/absolute/path/to/dsh-web-annotate"
 
 ## 更新记录
 
+- **0.4.0** — 新增对话输入框左侧的 **◱ 网页** 按钮，手动打开面板输地址；浏览器启动时暴露 CDP 端点（`/health` 的 `cdpEndpoint`），配合 `mode: attach` 可让 DSH 的浏览器工具接管侧栏这个浏览器。冒烟增至 12 项，含真实 CDP 端点存活检查。
 - **0.3.0** — 攻克三处硬限制：拾取可递归穿透 iframe（`frame.childFrames()` 逐层进入子文档，跨域也能读，最多 4 层，浮层显示所在层级）；新增 `⌨` 页面文本输入面板，用 `keyboard.insertText` 送中文等任意字符；新增 `⤓` 导出，把汇总写成 Markdown 到 `~/.dsh/web-annotate/`。自检 19 项，冒烟 11 项。
 - **0.2.0** — 批注汇总可直接回填输入框（在 `conversation.input.left` 挂桥接组件拿到 `inputActions`，桥不可用时退回复制）；新增 `Ctrl+Shift+.` 快捷键、拖动框选区域、方向键与编辑键转发、批注 `localStorage` 持久化。自检增至 17 项。
 - **0.1.0** — 首个版本。

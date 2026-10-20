@@ -223,6 +223,19 @@ async function main() {
       console.log('        exported to ' + body.data.path);
     });
 
+    await check('暴露 CDP 端点供 playwright-mcp attach', async () => {
+      const health = await (await fetch(base + '/health')).json();
+      assert(
+        health.data.cdpEndpoint === 'http://127.0.0.1:9222',
+        '未暴露 CDP 端点：' + JSON.stringify(health.data.cdpEndpoint)
+      );
+      const res = await fetch('http://127.0.0.1:9222/json/version');
+      assert(res.ok, 'CDP 端点不可访问：HTTP ' + res.status);
+      const info = await res.json();
+      assert(info.Browser, 'CDP 返回缺少 Browser 字段');
+      console.log('        cdp endpoint alive: ' + info.Browser);
+    });
+
     await check('刷新页面', async () => {
       const res = await fetch(base + '/reload', {
         method: 'POST',
