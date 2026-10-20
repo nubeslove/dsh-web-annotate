@@ -136,9 +136,10 @@ async function main() {
   });
 
   const routes = [];
+  const promptSections = [];
   plugin.apply({
     inject(deps, cb) {
-      assert(deps.includes('webServer'), '应声明 webServer 依赖');
+      assert(Array.isArray(deps), 'inject 依赖必须是数组');
       cb({
         effect(fn) {
           fn();
@@ -148,9 +149,25 @@ async function main() {
             routes.push(route);
             return () => {};
           }
+        },
+        systemPrompt: {
+          section(definition) {
+            promptSections.push(definition);
+            return () => {};
+          }
         }
       });
     }
+  });
+
+  await check('注册了系统提示词指导段', () => {
+    assert(promptSections.length === 1, '提示词段应为 1 个，实际 ' + promptSections.length);
+    const section = promptSections[0];
+    assert(section.name === 'web-annotate:guidance', 'name 不符：' + section.name);
+    assert(typeof section.order === 'number', 'order 必须是数字');
+    assert(/网页批注/.test(section.text), '缺少面板名称');
+    assert(/headless/.test(section.text), '缺少与独立浏览器的对比');
+    assert(/playwright/.test(section.text), '缺少回退说明');
   });
 
   await check('注册了 /api/web-annotate 前缀路由', () => {

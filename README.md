@@ -59,6 +59,16 @@ Point at a live element inside the DSH sidebar, drop a comment on it, and get ba
 
 **注意**：`attach` 模式下浏览器必须先在跑。如果插件没启动浏览器（没打开过面板、或插件被禁用），模型的浏览器工具会直接失败。想退回独立浏览器，把 `mode` 改回 `launch`、删掉 `endpoint` 即可。端口可用环境变量 `DSH_ANNOTATE_CDP_PORT` 改；端口被占用时插件会自动退化为不开调试端口，此时 `cdpEndpoint` 为 `null`。
 
+## 模型侧行为
+
+插件会往系统提示词里注册一段指导（`web-annotate:guidance`，order `8600`），让模型在调试网页、验证前端改动时优先用这个面板：
+
+> 调试网页、验证前端改动、或需要确认页面渲染效果时，优先让用户在 DSH 侧栏的「网页批注」面板里打开页面，而不是启动独立的 headless 浏览器，也不要让用户切到外部浏览器。
+
+模型因此更容易主动建议「在侧栏打开这个地址」，你就能随时批注，不用等它自己切到外部浏览器。
+
+不想要这个行为，卸载插件即可，提示词段随插件一起消失，不留残留。
+
 ## 汇总长这样
 
 ```markdown
@@ -177,6 +187,7 @@ dsh plugin --profile desktop add "link:/absolute/path/to/dsh-web-annotate"
 
 ## 更新记录
 
+- **0.4.1** — 往系统提示词里注册 `web-annotate:guidance`，让模型调试网页时优先用这个面板而不是 headless 浏览器，用户可以随时批注。自检增至 20 项。
 - **0.4.0** — 新增对话输入框左侧的 **◱ 网页** 按钮，手动打开面板输地址；浏览器启动时暴露 CDP 端点（`/health` 的 `cdpEndpoint`），配合 `mode: attach` 可让 DSH 的浏览器工具接管侧栏这个浏览器。冒烟增至 12 项，含真实 CDP 端点存活检查。
 - **0.3.0** — 攻克三处硬限制：拾取可递归穿透 iframe（`frame.childFrames()` 逐层进入子文档，跨域也能读，最多 4 层，浮层显示所在层级）；新增 `⌨` 页面文本输入面板，用 `keyboard.insertText` 送中文等任意字符；新增 `⤓` 导出，把汇总写成 Markdown 到 `~/.dsh/web-annotate/`。自检 19 项，冒烟 11 项。
 - **0.2.0** — 批注汇总可直接回填输入框（在 `conversation.input.left` 挂桥接组件拿到 `inputActions`，桥不可用时退回复制）；新增 `Ctrl+Shift+.` 快捷键、拖动框选区域、方向键与编辑键转发、批注 `localStorage` 持久化。自检增至 17 项。
