@@ -1,6 +1,6 @@
 {
   "name": "dsh-web-annotate",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "DSH 侧栏网页批注：在宿主里跑真实浏览器，指向页面元素即可看到标签/尺寸/颜色/字体，点一下就地批注，汇总成结构化指令。",
   "type": "module",
   "main": "./lib/index.js",
@@ -60,3 +60,4 @@
     "node": ">=22.19"
   }
 }
+
